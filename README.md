@@ -12,6 +12,7 @@
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Passport](https://img.shields.io/badge/Passport-34E27A?style=for-the-badge&logo=passport&logoColor=white)](http://www.passportjs.org/)
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://swagger.io/)
 
 ---
 
@@ -24,6 +25,7 @@
   - [Redis Caching Layer](#3-redis-caching-layer)
   - [Job Queue Architecture](#4-job-queue-architecture-producer-consumer)
   - [Event-Driven Architecture](#5-event-driven-architecture)
+  - [Swagger / OpenAPI](#6-swagger--openapi)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -238,6 +240,55 @@ graph LR
 
 ---
 
+### 6. Swagger / OpenAPI
+
+The API is fully documented using **Swagger / OpenAPI 3.0** via `@nestjs/swagger`. An interactive UI is auto-generated from the controller and DTO decorators.
+
+```mermaid
+graph LR
+    subgraph Decorators["Code Decorators"]
+        direction TB
+        CT["@ApiTags"]
+        CO["@ApiOperation"]
+        CB["@ApiBody / @ApiParam"]
+        CR["@ApiResponse"]
+        CA["@ApiBearerAuth"]
+    end
+
+    subgraph SwaggerPipeline["Swagger Pipeline"]
+        direction TB
+        DB["DocumentBuilder\n(main.ts)"]
+        SM["SwaggerModule\n.createDocument()"]
+    end
+
+    subgraph Output["Output"]
+        UI["Swagger UI\n/api"]
+        JSON["OpenAPI JSON\n/api-json"]
+    end
+
+    CT & CO & CB & CR & CA --> SM
+    DB --> SM
+    SM --> UI
+    SM --> JSON
+
+    style UI fill:#85EA2D,stroke:#5DAA1A,color:#000
+    style JSON fill:#85EA2D,stroke:#5DAA1A,color:#000
+```
+
+**Swagger configuration:**
+
+| Setting | Value |
+| :--- | :--- |
+| **UI Endpoint** | `http://localhost:3000/api` |
+| **JSON Endpoint** | `http://localhost:3000/api-json` |
+| **Auth Schemes** | `access-token` (Bearer JWT), `refresh-token` (Bearer JWT) |
+| **Tags** | `Auth`, `Users`, `Logs`, `App` |
+| **Package** | `@nestjs/swagger` |
+
+> After starting the server, visit **http://localhost:3000/api** to explore and test all endpoints interactively.
+
+---
+
 ## ✨ Features
 
 ### 🔐 Secure Authentication
@@ -261,6 +312,12 @@ graph LR
 - **Decoupled Services** — `@nestjs/event-emitter` for intra-process pub/sub
 - **Domain Events** — `user.created` and `user.login` events drive side-effects
 
+### 📜 Swagger / OpenAPI
+- **Auto-Generated Docs** — Interactive Swagger UI at `/api` built from code decorators
+- **Try-It-Out** — Test every endpoint directly from the browser
+- **Dual Auth Schemes** — Supports both Access Token and Refresh Token authentication in the UI
+- **Request/Response Schemas** — DTOs with `@ApiProperty` produce accurate request bodies and response models
+
 ### 🛡️ Type Safety & Validation
 - Full **TypeScript** with strict mode
 - **DTOs** validated with `class-validator` and transformed via `class-transformer`
@@ -282,6 +339,7 @@ graph LR
 | **Auth** | Passport.js, `@nestjs/jwt` |
 | **Queue** | Custom MongoDB-backed queue (`@nestjs/schedule`) |
 | **Events** | `@nestjs/event-emitter` |
+| **API Docs** | Swagger / OpenAPI 3.0 (`@nestjs/swagger`) |
 | **Validation** | `class-validator` + `class-transformer` |
 
 ---
@@ -392,11 +450,25 @@ On successful startup you should see:
 MongoDB connected to cluster
 Redis ping: PONG
 Server is running on port 3000
+Swagger docs available at http://localhost:3000/api
 ```
 
 ---
 
 ## 📡 API Documentation
+
+### Swagger UI
+
+Once the server is running, open **http://localhost:3000/api** in your browser to access the full interactive Swagger documentation. From there you can:
+
+- Browse all endpoints grouped by tag (`Auth`, `Users`, `Logs`, `App`)
+- View request/response schemas auto-generated from DTOs
+- Authenticate using the **Authorize** button (paste your JWT)
+- Execute requests directly with **Try it out**
+
+> The raw OpenAPI JSON spec is also available at `http://localhost:3000/api-json`.
+
+### Endpoints Overview
 
 ### Authentication & Users
 
